@@ -60,8 +60,6 @@ int seed = 0;
 
 dpl_ctx_t *ctx = NULL;
 
-struct drand48_data drbuffer;
-
 pthread_attr_t g_detached_thread_attr, g_joinable_thread_attr;
 
 static pthread_mutex_t stats_lock = PTHREAD_MUTEX_INITIALIZER;
@@ -108,7 +106,7 @@ static void *test_main(void *arg)
 
   pthread_cleanup_push(test_cleanup, arg);
 
-  oid = get_oid(oflag, &drbuffer);
+  oid = get_oid(oflag, &seed);
 
   for (i = 0; i < n_ops;i++)
     {
@@ -120,7 +118,7 @@ static void *test_main(void *arg)
       snprintf(id_str, sizeof (id_str), "%llu", (unsigned long long) oid);
 
       if (rflag)
-        block_size = rand() % max_block_size;
+        block_size = rand_r(seed) % max_block_size;
       else
         block_size = max_block_size;
 
@@ -426,8 +424,7 @@ int main(int argc, char **argv)
 {
   char opt;
 
-  memset(&drbuffer, 0, sizeof(struct drand48_data));
-
+  seed = 0;
   while ((opt = getopt(argc, argv, "t:PRzrb:N:n:vB:p:oC:S:U")) != -1)
     switch (opt)
       {
@@ -471,8 +468,8 @@ int main(int argc, char **argv)
         class = atoi(optarg);
         break;
       case 'S':
-        srand48_r(atoi(optarg), &drbuffer);
         seed = atoi(optarg);
+        srand(seed);
         break;
       case 'v':
         vflag++;

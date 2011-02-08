@@ -31,6 +31,7 @@
  *
  * https://github.com/scality/Droplet
  */
+#define BIND_8_COMPAT 1
 #include <dropletp.h>
 
 //#define DPRINTF(fmt,...) fprintf(stderr, fmt, ##__VA_ARGS__)
@@ -66,7 +67,7 @@ gettid()
   return -1; //XXX
 }
 #else
-#include <syscall.h>
+#include <sys/syscall.h> 
 pid_t
 gettid()
 {
@@ -90,20 +91,16 @@ linux_gethostbyname_r(const char *name,
                       struct hostent **result,
                       int *h_errnop)
 {
-#if defined(SOLARIS) || defined(__sun__)
   struct hostent *resultp;
 
-  resultp = gethostbyname_r(name, ret, buf, buflen, h_errnop);
+  resultp = gethostbyname(name);
   if (NULL == resultp)
     return 1;
 
-  *result = resultp;
+  *ret = *resultp;
+  *result = ret;
 
   return 0;
-#else
-  //linux
-  return gethostbyname_r(name, ret, buf, buflen, result, h_errnop);
-#endif
 }
 
 /*

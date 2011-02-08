@@ -65,14 +65,16 @@
 
 #else
 // linux case
-# include <endian.h>
+//# include <endian.h>
 #endif
 
 #if defined(SOLARIS) || defined(__sun__)
 # include <asm/byteorder.h>
 //defines htonll() and ntohll() natively
-#else
-# include <byteswap.h>
+//#else
+//# include <byteswap.h>
+
+#define __BYTE_ORDER __LITTLE_ENDIAN
 
 #ifndef __BYTE_ORDER
 # error "byte order is not defined"

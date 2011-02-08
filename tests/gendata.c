@@ -80,7 +80,7 @@ int check_data(char *id, char *buf, int len)
 }
 
 uint64_t
-get_oid(int oflag, struct drand48_data *pdrbuffer)
+get_oid(int oflag, unsigned int *seed)
 {
   static uint64_t static_oid = 0;
   static pthread_mutex_t oid_lock = PTHREAD_MUTEX_INITIALIZER;
@@ -89,8 +89,12 @@ get_oid(int oflag, struct drand48_data *pdrbuffer)
   if (1 == oflag)
     {
       long int tmp;
+      int tmp1;
+      int tmp2;
       pthread_mutex_lock(&oid_lock);
-      lrand48_r(pdrbuffer, &tmp);
+      tmp1 = rand_r(seed);
+      tmp2 = rand_r(seed);
+      tmp = tmp1 << 32 + tmp2;
       oid = tmp;
       pthread_mutex_unlock(&oid_lock);
       return oid;
